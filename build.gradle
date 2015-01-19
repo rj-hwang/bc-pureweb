@@ -1,13 +1,20 @@
 apply plugin: 'java'
 //apply plugin: 'maven'
+apply plugin: 'maven-publish' // for nexus
 //apply plugin: 'eclipse'
 //apply plugin: 'idea'
 
-sourceCompatibility = 1.8
-version = '1.0'
+sourceCompatibility = 1.7
+targetCompatibility = 1.7  
+
+group = "cn.sb.web.appserver" 
+version = '1.0-SNAPSHOT'
+
+//defaultTasks 'clean', 'jar' 
+
 jar {
     manifest {
-        attributes 'Implementation-Title': 'PureWeb Quickstart',
+        attributes 'Implementation-Title': 'PureWeb Server',
                 'Implementation-Version': version,
                 'Author': 'dragon'
     }
@@ -15,13 +22,16 @@ jar {
 
 repositories {
     // Use 'jcenter' for resolving your dependencies.
-    jcenter()
+    //jcenter()
 
     // use the local Maven cache as a repository
     //mavenLocal()
 
     // add the central Maven 2 repository (http://repo1.maven.org/maven2)
     //mavenCentral()
+
+    // nexus
+    maven {url "http://192.168.0.222:8081/nexus/content/groups/public/"} 
 }
 
 configurations {
@@ -29,6 +39,7 @@ configurations {
     compile.exclude module: 'commons-logging'
     compile.exclude module: 'log4j'
 }
+
 dependencies {
     // log
     compile 'org.slf4j:slf4j-api:1.+'   // 1.7.7
@@ -76,3 +87,30 @@ task listTestCompileJars << {
 task listTestRuntimeJars << {
     configurations.testRuntime.each { File file -> println file.name }
 }
+
+// 打包源代码
+task sourceJar(type: Jar) { 
+    from sourceSets.main.allJava 
+}
+
+// 发布到 nexus
+publishing { 
+    publications { 
+        mavenJava(MavenPublication) { 
+            from components.java 
+
+            artifact sourceJar { 
+                classifier "sources" 
+            } 
+        } 
+    } 
+    repositories { 
+        maven { 
+            url "http://192.168.0.222:8081/nexus/content/repositories/snapshots"  
+            credentials { 
+              username 'admin' 
+              password 'admin123' 
+            } 
+        } 
+    } 
+} 
