@@ -9,6 +9,7 @@ Thumbs.db
 *.log.*
 build
 bin
+out
 .bpmn
 .DS_Store
 *.iml
