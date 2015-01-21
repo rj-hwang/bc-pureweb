@@ -6,7 +6,8 @@ apply plugin: 'maven-publish' // for nexus
 //apply plugin: 'idea'
 apply plugin: 'java'
 apply plugin: 'war'
-apply plugin: 'jetty'
+//apply from: 'https://raw.github.com/akhikhl/gretty/master/pluginScripts/gretty.plugin'
+apply from: 'gretty.plugin'
 
 //sourceCompatibility = 1.7
 //targetCompatibility = 1.7  
@@ -32,14 +33,13 @@ war {
                 'BuildTime': "${buildTime()}"
     }
 }
-jettyRun {
-    contextPath = "sb"
-    httpPort = 8081
+gretty {
+  httpPort = 8081
+  contextPath = '/sb'
+  // managedClassReload = true
+  servletContainer = 'tomcat8' // jetty7, jetty8, jetty9, tomcat7, tomcat8
 }
-jettyRunWar {
-    contextPath = "sb"
-    httpPort = 8081
-}
+
 repositories {
     // Use 'jcenter' for resolving your dependencies.
     //jcenter()
